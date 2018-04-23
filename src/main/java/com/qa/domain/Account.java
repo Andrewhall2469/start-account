@@ -11,18 +11,20 @@ import javax.persistence.Table;
 @Table(name="ACCOUNT")
 		public class Account {
 
-	@Id
-	@GeneratedValue(strategy=GenerationType.IDENTITY)
-	@Column(length = 4, name="ACCOUNT_NUMBER")
-	private int accountNumber;
+	
 	
 	@Column(length = 50, name="FIRST_NAME")
 	private String firstName;
 	
 	@Column(length = 50, name="SECOND_NAME")
 	private String secondName;
+	
+	@Id
+	@GeneratedValue(strategy=GenerationType.IDENTITY)
+	@Column(length = 4, name="ACCOUNT_NUMBER")
+	private String accountNumber;
 
-	public Account(String firstName, String secondName, int accountNumber) {
+	public Account(String firstName, String secondName, String accountNumber) {
 		this.firstName = firstName;
 		this.secondName = secondName;
 		this.accountNumber = accountNumber;
@@ -44,11 +46,11 @@ import javax.persistence.Table;
 		this.secondName = secondName;
 	}
 
-	public int getAccountNumber() {
+	public String getAccountNumber() {
 		return accountNumber;
 	}
 
-	public void setAccountNumber(int accountNumber) {
+	public void setAccountNumber(String accountNumber) {
 		this.accountNumber = accountNumber;
 	}
 
