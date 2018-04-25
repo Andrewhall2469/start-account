@@ -15,8 +15,10 @@ import javax.transaction.Transactional;
 import com.qa.domain.Account;
 import com.qa.util.JSONUtil;
 
+
 @Transactional(SUPPORTS)
-public class Repoistory implements AccountRepository {
+@Default
+public class Repoistory implements AccountRepo {
 	
 	
 	

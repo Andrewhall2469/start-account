@@ -46,7 +46,7 @@ public class RepositoryTest {
 	{
 		String actualValue = repository.createAccount("{\"firstName\":\"Hall\",\"secondName\":\"Andy\",\"accountNumber\":\"1237\"}");
 		String expectedValue = "Account added";
-		Assert.assertEquals(actualValue ,expectedValue);
+		Assert.assertEquals(actualValue , expectedValue);
 	}
 	
 	
