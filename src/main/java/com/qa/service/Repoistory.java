@@ -1,62 +1,84 @@
 package com.qa.service;
 
-import java.util.List;
-
 import static javax.transaction.Transactional.TxType.REQUIRED;
 import static javax.transaction.Transactional.TxType.SUPPORTS;
 
+import java.util.Collection;
+
+import javax.enterprise.inject.Default;
+import javax.inject.Inject;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
-import javax.persistence.TypedQuery;
+import javax.persistence.Query;
 import javax.transaction.Transactional;
 
 import com.qa.domain.Account;
+import com.qa.util.JSONUtil;
 
 @Transactional(SUPPORTS)
-public class Repoistory {
+public class Repoistory implements AccountRepository {
 	
-	public List<Account> getAllAccounts() 
-	{
-		TypedQuery<Account> query = em.createQuery("SELECT a FROM Account", Account.class);
-		return query.getResultList();
-	}
+	
 	
 	@PersistenceContext(unitName = "primary")
 	private EntityManager em;
+	
+	@Inject
+	private JSONUtil jSON;
 	
 	public Account findAccount(String accountNumber) 
 	{
 		return em.find(Account.class, accountNumber);
 	}
 	
-	@Transactional(REQUIRED)
-	public Account createAccount(Account account)
+	@Override
+	public String getAllAccounts() 
 	{
-		Account accountCreate = new Account("Andy", "H", "1234");
-		em.getTransaction().begin();
-		em.persist(accountCreate);
-		em.getTransaction().commit();
-		return accountCreate;
+		Query query = em.createQuery("SELECT a FROM Account a");
+		Collection<Account> accounts = (Collection<Account>) query.getResultList();
+		return jSON.getJSONForObject(accounts);
 	}
 	
+	@Override
 	@Transactional(REQUIRED)
-	public Account updateAccount(String accountNumber) {
-		Account accountUpdate = em.find(Account.class, accountNumber);
-		accountUpdate.setFirstName("John");
-		accountUpdate.setSecondName("Johnson");
-		em.getTransaction().commit();
-		return accountUpdate;
+	public String createAccount(String account)
+	{
+		Account newAccount = jSON.getObjectForJSON(account, Account.class);
+		em.persist(newAccount);
+		return "Account added";
 	}
 	
+	@Override
 	@Transactional(REQUIRED)
-	public Account deleteAccount(String accountNumber) {
-		Account accountDelete = em.find(Account.class, accountNumber);
-		em.getTransaction().begin();
-		em.remove(accountDelete);
-		em.getTransaction().commit();
-		return accountDelete;
+	public String updateAccount(String accountNumber, String update) {
+		Account accountUpdate = jSON.getObjectForJSON(update, Account.class);
+		Account findAcc = findAccount(accountNumber);
+		if (update != null) 
+		{
+			findAcc = accountUpdate;
+			em.merge(findAcc);
+		}
+		return "Account updated";
 	}
 	
+	@Override
+	@Transactional(REQUIRED)
+	public String deleteAccount(String accountNumber) {
+		Account accountDelete = findAccount(accountNumber);
+		if (accountDelete != null) 
+		{
+			em.remove(accountDelete);
+		}
+		return "Account removed from database";
+	}
+	
+	public void setUtil(JSONUtil jSON) {
+		this.jSON = jSON;
+	}
+
+	public void manager(EntityManager em) {
+		this.em = em;
+	}
 	
 
 }
